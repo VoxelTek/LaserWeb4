@@ -78,7 +78,7 @@ export function processDXF(state, docFile, dxfTree) {
     // Create errorLog message
     if(errorLog.length) {
       alert(`Errors found in ${docFile.name} please re-save in R12 ASCII format.\n\
-             Check console log and <a href="http://cncpro.co/index.php/35-documentation/working-with-files/working-with-dxf" target="_blank">documentation</a> for more details.`)
+             Check console log and <a href="https://github.com/LaserWeb/LaserWeb4/wiki/4.1-Working-with-files#working-with-dxf-files" target="_blank">documentation</a> for more details.`)
       console.log(`Errors found in ${docFile.name}\n`+errorLog.join('\n'))
     }
     errorLog = [];

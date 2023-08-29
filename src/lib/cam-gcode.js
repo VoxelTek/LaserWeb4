@@ -25,8 +25,8 @@ import queue from 'queue';
 import hhmmss from 'hhmmss';
 
 export const expandHookGCode = (operation) =>{
-    let state = GlobalStore().getState(); 
-    let macros = state.settings.macros || {};
+    const state = GlobalStore().getState();
+    const macros = state.settings.macros || {};
     let op=Object.assign({},operation)
     let hooks = Object.keys(op).filter(i=>i.match(/^hook/gi))
         hooks.forEach(hook => {
@@ -46,7 +46,7 @@ export const expandHookGCode = (operation) =>{
 export function getGcode(settings, documents, operations, documentCacheHolder, showAlert, done, progress) {
     "use strict";
 
-    let starttime=new Date().getTime()
+    const startTime=new Date().getTime()
 
     const QE = new queue();
     QE.timeout = 3600 * 1000;
@@ -65,7 +65,7 @@ export function getGcode(settings, documents, operations, documentCacheHolder, s
         }
 
         let invokeWebWorker = (ww, props, cb, jobIndex) => {
-            let peasant = new ww();
+            let peasant = new ww(); //LMAO what
             peasant.onmessage = (e) => {
                 let data = JSON.parse(e.data)
                 if (data.event == 'onDone') {
@@ -182,8 +182,9 @@ export function getGcode(settings, documents, operations, documentCacheHolder, s
 
     QE.start((err) => {
         progress(100)
-        let elapsed=(new Date().getTime()-starttime)/1000;
-        showAlert("Elapsed: "+hhmmss(elapsed)+String(Number(elapsed-Math.floor(elapsed)).toFixed(3)).substr(1),"info");
+        const elapsed=(new Date().getTime()-startTime)/1000;
+        //showAlert("Elapsed: "+hhmmss(elapsed)+String(Number(elapsed-Math.floor(elapsed)).toFixed(3)).substr(1),"info");
+        showAlert("Elapsed: " + hhmmss(elapsed)+String(Number(elapsed%1).toFixed(3)).substr(1),"info"); //Dunno what 'info' is, but I think this is just converting 'elapsed' from seconds to hours, minutes, and seconds, and then adding milliseconds to that.
         done(settings.gcodeStart + gcode.join('\r\n') + settings.gcodeEnd);
     })
 

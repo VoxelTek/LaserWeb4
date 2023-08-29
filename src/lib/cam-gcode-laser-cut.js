@@ -45,17 +45,18 @@ export function getLaserCutGcode(props) {
         gcodeToolOn += '\r\n';
     if (gcodeToolOff)
         gcodeToolOff += '\r\n';
-    let laserOnS = gcodeLaserIntensity + (gcodeSMinValue + (gcodeSMaxValue - gcodeSMinValue) * laserPower / 100).toFixed(decimal);
+    const laserOnS = gcodeLaserIntensity + (gcodeSMaxValue * (laserPower / 100)).toFixed(decimal);
 
     let lastX = 0, lastY = 0, lastA = 0;
     function convertPoint(p, rapid) {
-        let x = p.X * scale + offsetX;
-        let y = p.Y * scale + offsetY;
+        const x = p.X * scale + offsetX;
+        const y = p.Y * scale + offsetY;
         if (useA) {
-            let a = y * 360 / aAxisDiameter / Math.PI;
-            let roundedX = Number(x.toFixed(decimal));
-            let roundedA = Number(a.toFixed(decimal));
-            let adjustedY = roundedA * aAxisDiameter * Math.PI / 360;
+            const a = (y * 360) / (aAxisDiameter * Math.PI);
+            const roundedX = Number(x.toFixed(decimal));
+            const roundedA = Number(a.toFixed(decimal));
+            //const adjustedY = roundedA * aAxisDiameter * Math.PI / 360;
+            const adjustedY = (roundedA / (a / y)))
             if (rapid) {
                 lastX = roundedX;
                 lastY = adjustedY;
@@ -63,8 +64,8 @@ export function getLaserCutGcode(props) {
               //return 'G0 X' + x.toFixed(decimal) + ' A' + a.toFixed(decimal);
               return {x: x.toFixed(decimal), a: a.toFixed(decimal)};
             } else {
-                let dx = roundedX - lastX, dy = adjustedY - lastY, da = roundedA - lastA;
-                let travelTime = Math.sqrt(dx * dx + dy * dy) / cutFeed;
+                const dx = roundedX - lastX, dy = adjustedY - lastY, da = roundedA - lastA;
+                const travelTime = Math.sqrt(dx * dx + dy * dy) / cutFeed;
                 let f = 0;
                 if (dx)
                     f = Math.abs(dx) / travelTime;
@@ -109,9 +110,9 @@ export function getLaserCutGcode(props) {
                 continue;
             gcode += '\r\n; Pass ' + pass + ' Path ' + pathIndex + '\r\n';
 
-            let separatedPaths = separateTabs(path, tabGeometry);
+            const separatedPaths = separateTabs(path, tabGeometry);
             for (let selectedIndex = 0; selectedIndex < separatedPaths.length; ++selectedIndex) {
-                let selectedPath = separatedPaths[selectedIndex];
+                const selectedPath = separatedPaths[selectedIndex];
                 if (selectedPath.length === 0)
                     continue;
                 if (selectedIndex & 1) {
@@ -122,7 +123,7 @@ export function getLaserCutGcode(props) {
 
                 if (useZ && !usedZposition) {
                     usedZposition = true;
-                    let zHeight = useZ.startZ + useZ.offsetZ - (useZ.passDepth * pass);
+                    const zHeight = useZ.startZ + useZ.offsetZ - (useZ.passDepth * pass);
                     gcode += `; Pass Z Height ${zHeight}mm (Offset: ${useZ.offsetZ}mm)\r\n`;
                     gcode += 'G0 Z' + zHeight.toFixed(decimal) + '\r\n\r\n';
                 }
@@ -178,11 +179,11 @@ export function getLaserCutGcodeFromOp(settings, opIndex, op, geometry, openGeom
         }
     }
     if (op.laserPower < 0 || op.laserPower > 100) {
-        showAlert("Laser Power must be in range [0, 100]", "danger");
+        showAlert("Laser Power must be in range of 0 to 100", "danger");
         ok = false;
     }
     if (op.passes <= 0 || (op.passes | 0) !== +op.passes) {
-        showAlert("Passes must be integer > 0", "danger");
+        showAlert("Pass count must be an integer greater than 0", "danger");
         ok = false;
     }
     if (op.cutRate <= 0) {
@@ -191,7 +192,7 @@ export function getLaserCutGcodeFromOp(settings, opIndex, op, geometry, openGeom
     }
     if (op.useA) {
         if (op.aAxisDiameter <= 0) {
-            showAlert("A axis diameter must be greater than 0", "danger");
+            showAlert("Axis diameter A must be greater than 0", "danger");
             ok = false;
         }
     }
